@@ -1,4 +1,4 @@
-<img src="http://assets.innbetweenworlds.com/media/campfire/fireIconWhiteT.png" height="50">
+<img src="https://raw.githubusercontent.com/secretsciencelab/secretcampfire/master/public/media/logoLight.png" height="50">
 
 # secret campfire (version 1.0)
 
@@ -33,7 +33,7 @@ An immortal personal microblogging system that...
   
 ## 
 
-![secretcampfire](http://assets.innbetweenworlds.com/media/campfire/glowingForest.jpg)
+![secretcampfire](https://raw.githubusercontent.com/secretsciencelab/secretcampfire/master/public/media/glowingForest.jpg)
 
 ## Prologue
 
