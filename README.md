@@ -28,7 +28,7 @@ An immortal personal microblogging system that...
 
 6. In the `Add-ons` search bar, type `mlab` and select `mLab MongoDB`. This database stores your blog's content. Select the `Sandbox - Free` plan and click `Provision`.
 
-7. Visit `your-app.herokuapp.com` in a browser (where `your-app` is the name you entered in step 3). 
+7. Visit `your-app.herokuapp.com` in a browser (where `your-app` is the name you entered in Step 3). 
 
 8. If all went well, you'll see a welcome message that says "Congratulations! Your secret campfire blog is alive!" Follow the instructions there to set your password and secure your blog. 
   
@@ -42,16 +42,16 @@ Once upon a time, most websites on the Internet were owned by the people. Humble
 
 When someone else controls your data, they have power over you. They can hold you hostage, control what you say and strangle your voice anytime what you say does not agree with their business agenda. And so today, more than ever, our freedom is in danger.
 
-That's why `secret campfire` was created on January 2019. Because as you've already noticed, there just aren't any good options out there. And we didn't want to roll the dice and invest in yet another *flavor-of-the-month* platform... only to have them betray us or crap out later.  
+That's why `secret campfire` was created on January 2019. Because as you've already noticed, there just aren't any good options out there. And we got tired of rolling the dice and investing in yet another *flavor-of-the-month* platform... only to have them betray us or crap out later.  
 
 With `secret campfire`, you can finally set up your forever home online. It belongs to you and you alone. No one can tell you what you can or can't do with it. And no one can shut you down. 
 
 Enjoy the 'fire and share the love: http://secretcampfire.com
 
-### Troubleshooting
+### Frequently asked questions
 
 See [FAQ](docs/FAQ.md)
 
-### For secret goodies and hidden features
+### Secret goodies and hidden features
 
 See [ADVANCED](docs/ADVANCED.md)
