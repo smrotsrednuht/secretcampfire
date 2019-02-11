@@ -6,7 +6,9 @@ To start, visit this page to *Register an Application*: https://api.imgur.com/oa
 
 Under *Authorization type*, make sure to select *Anonymous usage without user authentication*. Leave *Authorization callback URL* empty. You may enter anything you want in the remaining fields. Click *submit*.
 
-On the next page, you'll find your `Client ID` and your `Client secret`. Save both for your records, but what `secret campfire` needs is the `Client ID`. This is what you enter into your blog's `Settings` page.
+On the next page, you'll find your `Client ID` and your `Client secret`. Save both for your records, but what `secret campfire` needs is the `Client ID`. 
+
+Enter your Imgur `Client ID` into your blog's `Settings` page.
 
 Once you do this, image file upload buttons will be unlocked throughout your blog.
 
@@ -42,6 +44,8 @@ Next, we will tell your Heroku app to use this database you just created:
 4. Enter `MONGODB_URI` into the left box and the URL that looks like `mongodb://<dbuser>:<dbpassword>@ds127655.mlab.com:27655/<database_name>` into the right box. Replace `<dbuser>` and `<dbpassword` with the `username` and `password` you used in Step 9. above. Replace `<database_name>` with the name you used in Step 6. above.
 
 You're all set! Only catch is without a credit card on Heroku, your free quota remains at 550 hours per month -- not enough to run your blog 24/7. It'll go to sleep whenever it's idle for 30 minutes and it'll take a couple of seconds to wake up whenever you get visitors.
+
+--- 
 
 ## How to upgrade your `secret campfire` blog to the latest official version
 
