@@ -14,9 +14,9 @@ Because you are now graduating from a *simple user of the Internet* to an __owne
 
 If you want things to be brain-dead simple, there are many other options available where someone else takes care of your blog for you. But as you know, the trade-off when someone runs your blog for you is that you don't really own anything. They own you.
 
-If you want the freedom of owning and keeping what you own, there will be a slight learning curve. But these are good things to know, because knowledge is power. For years, all these other sites have happily kept people ignorant, helpless and in the dark. Think about it -- they don't want you to know how to run your own site. They make more money if you don't know how to run your own site and are completely dependent on them. 
+If you want the freedom of owning and keeping what you own, there will be a slight learning curve. But these are good things to know, because knowledge is power. For years, all these other sites have happily kept people ignorant, helpless and in the dark. Think about it -- they **don't want you to know** how to run your own site. They make **more money** if you don't know how to run your own site and are completely dependent on them. 
 
-In contrast, `secret campfire` will show you exactly how to run your own server so you can finally be independent and free. But of course, our goal is to make it as simple as possible -- it's only as hard as it needs to be but no harder.
+In contrast, `secret campfire` will show you exactly how to run your own server so you can finally be independent and free. But of course, our goal is to make it as simple as possible -- it's only as hard as it needs to be but no harder. In fact, it's so easy... you don't even need a computer.
 
 --- 
 
@@ -33,9 +33,23 @@ If you are opposed to this, you can still use `secret campfire` without a credit
 
 --- 
 
+## How can I have multiple blogs?
+
+First, repeat the steps in the [Quickstart](../README.md#quickstart-instructions-time-needed-5-minutes) for each new blog you want to create. 
+
+Then, as you sign in to each of your blogs, `secret campfire` remembers all the blogs you own. All your connected blogs appear in a handy menu at the top right of the screen. Select the blog you want to browse as, and all your `secret campfire` actions will be performed for your selected blog. E.g., if you select your *first blog* from the menu and then click a `Reblog` button on a post, the post will be reblogged to your *first blog*. 
+
+--- 
+
 ## How do I unlock image file uploads?
 
 [See here.](ADVANCED.md#how-to-unlock-image-file-uploads)
+
+--- 
+
+## How do I unlock Queued Posting?
+
+[See here.](ADVANCED.md#how-to-unlock-queued-posting)
 
 --- 
 
@@ -47,6 +61,6 @@ If you are opposed to this, you can still use `secret campfire` without a credit
 
 ## I have a suggestion / I found a problem / Please halp / I want to contribute / I want to thank you from the bottom of my heart / I am a big fan
 
-You can email me at kalona@secretcampfire.com. I read every email but I can't guarantee I'll answer every one. Thousands of people have joined already and more keep flooding in since Tumblr died. I'm only human, unfortunately, and I just can't do everything. That said, I give highest priority to brilliant suggestions and serious problems. And because of my delicate ego, I will always welcome flattery and praise.
+You can email me at kalona@secretcampfire.com. I read every email but I can't guarantee I'll answer every one. Thousands of people have joined already and more keep flooding in since Tumblr died. I'm only human, unfortunately, and I just can't do everything. That said, I give highest priority to clever suggestions and serious problems. And because of my delicate ego, I will always welcome flattery and praise.
 
 --- 
