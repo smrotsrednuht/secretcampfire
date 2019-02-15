@@ -1,5 +1,3 @@
-<!-- needs 'uri' defined in ejs --> 
-
 <!-- jumbotron -->
 <div class="jumbotron jumbotron-fluid" id="jumbotron"></div>
 <div id="masthead" class="collapse">
@@ -70,16 +68,24 @@ var Masthead = new function() {
 
         if (data.name)
           $("#masthead h1").html(data.name).show();
+        else
+          $("#masthead h1").html("").hide();
 
         if (data.description)
           $("#masthead .lead").html(data.description).show();
+        else
+          $("#masthead .lead").html("").hide();
 
         if (data.blog_url)
           $("#masthead a").attr('href', data.blog_url);
+        else
+          $("#masthead a").attr('href', "/");
       }
+      else
+        $("#masthead").hide();
     });
   }
 };
 
-Masthead.init("<%= uri %>");
+Masthead.init("<%= locals.uri %>");
 </script>
