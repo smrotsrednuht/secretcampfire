@@ -135,22 +135,6 @@ app.get('/', function(req, res) {
   });
 });
 
-app.get('/login', function(req, res) {
-  res.render('pages/login', {
-    'uri': _getFeedUrl(req)
-  });
-});
-
-app.post('/login', passport.authenticate('local', { 
-  successReturnToOrRedirect: '/',
-  failureRedirect: '/login' 
-}));
-
-app.get('/logout', function(req, res) {
-  req.logout();
-  res.redirect('/');
-});
-
 function _assembleFeed(req, posts, cb) {
   db.getSettings(function(err, settings) {
     var feed = {
@@ -187,8 +171,12 @@ app.get('/feed/:index?', _nocache, function (req, res) {
   if (req.query['n'])
     numToFetch = parseInt(req.query['n']);
 
+  filter = {};
+  if (req.query['tag'])
+    filter['tags'] = req.query['tag'];
+
   // send a page from DB
-  db.fetchPosts(index, numToFetch, function(err, posts) {
+  db.fetchPosts(index, numToFetch, filter, function(err, posts) {
     _assembleFeed(req, posts, function(feed) {
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(feed, null, 2));
@@ -197,77 +185,6 @@ app.get('/feed/:index?', _nocache, function (req, res) {
 
   if (index == 0)
     db.addFollower(req.headers.referer);
-});
-
-app.get('/post/sources/count', function (req, res) {
-  db.getPostSourcesCount(function(err, num) {
-    ret = {
-      'n': num
-    }
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(ret, null, 2));
-  });
-});
-
-app.get('/post/sources/:index?', function (req, res) {
-	var index = req.params['index'];
-  index = (index)? parseInt(index) : 0;
-
-  db.getPostSources(index, 100, function(err, sources) {
-    res.setHeader('Content-Type', 'application/json');
-    ret = {
-      'sources': sources
-    }
-    res.send(JSON.stringify(ret, null, 2));
-  });
-});
-
-app.get('/post/count', function (req, res) {
-  db.getPostCount(function(err, num) {
-    ret = {
-      'n': num
-    }
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(ret, null, 2));
-  });
-});
-
-app.get('/post/:id', function (req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  db.getSettings(function(err, settings) {
-    db.getPost(req.params['id'], function(err, post) {
-      if (!post)
-      {
-        res.status(404).send("{}");
-        return;
-      }
-
-      var ret = {
-        'name': req.headers.host, 
-        'description': '',
-        'avatar_url': '',
-        'header_url': '',
-        'style_url': _getReqProtocol(req) 
-          + '://' + req.headers.host + '/stylesheets/feed.css',
-        'post': post,
-        'blog_url': _getReqProtocol(req) + "://" + req.headers.host
-      };
-
-      if (settings)
-      {
-        ret.name = settings.name;
-        ret.description = settings.description;
-        ret.avatar_url = settings.avatar_url;
-        ret.header_url = settings.header_url;
-      }
-
-      res.send(JSON.stringify(ret, null, 2));
-    });
-  });
-});
-
-app.get('/render/:uri?', function (req, res) {
-  _render(req, res, req.params['uri']);
 });
 
 app.get('/follow/check/:uri?', function (req, res) {
@@ -341,6 +258,105 @@ app.get('/is_owner', function (req, res) {
   res.send(JSON.stringify(ret, null, 2));
 });
 
+
+app.get('/login', function(req, res) {
+  res.render('pages/login', {
+    'uri': _getFeedUrl(req)
+  });
+});
+
+app.post('/login', passport.authenticate('local', { 
+  successReturnToOrRedirect: '/',
+  failureRedirect: '/login' 
+}));
+
+app.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
+});
+
+app.get('/post/sources/count', function (req, res) {
+  db.getPostSourcesCount(function(err, num) {
+    ret = {
+      'n': num
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(ret, null, 2));
+  });
+});
+
+app.get('/post/sources/:index?', function (req, res) {
+	var index = req.params['index'];
+  index = (index)? parseInt(index) : 0;
+
+  db.getPostSources(index, 100, function(err, sources) {
+    res.setHeader('Content-Type', 'application/json');
+    ret = {
+      'sources': sources
+    }
+    res.send(JSON.stringify(ret, null, 2));
+  });
+});
+
+app.get('/post/count', function (req, res) {
+  db.getPostCount(function(err, num) {
+    ret = {
+      'n': num
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(ret, null, 2));
+  });
+});
+
+app.get('/post/:id', function (req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  db.getSettings(function(err, settings) {
+    db.getPost(req.params['id'], function(err, post) {
+      if (!post)
+      {
+        res.status(404).send("{}");
+        return;
+      }
+
+      var ret = {
+        'name': req.headers.host, 
+        'description': '',
+        'avatar_url': '',
+        'header_url': '',
+        'style_url': _getReqProtocol(req) 
+          + '://' + req.headers.host + '/stylesheets/feed.css',
+        'post': post,
+        'blog_url': _getReqProtocol(req) + "://" + req.headers.host
+      };
+
+      if (settings)
+      {
+        ret.name = settings.name;
+        ret.description = settings.description;
+        ret.avatar_url = settings.avatar_url;
+        ret.header_url = settings.header_url;
+      }
+
+      res.send(JSON.stringify(ret, null, 2));
+    });
+  });
+});
+
+app.get('/render/:uri?', function (req, res) {
+  _render(req, res, req.params['uri']);
+});
+
+app.get('/tag/:tag/:index?', function (req, res) {
+  var index = req.params['index'];
+  index = (index)? parseInt(index) : 0;
+
+  uri = _getFeedUrl(req) 
+    + "/" + index
+    + "?tag=" + req.params['tag'];
+
+  _render(req, res, uri);
+});
+
 // catch-all route
 app.get('*', function (req, res, next) {
   if (req.url.indexOf("/dashboard") != -1
@@ -361,7 +377,7 @@ function _cronActivatePostQueue(interval) {
     + interval + " minute(s)");
 
   cron.addTask("post_from_queue", interval, function() {
-    db.fetchQueuedPosts(0, 1, function(err, posts) {
+    db.fetchQueuedPosts(0, 1, {}, function(err, posts) {
       if (!posts || posts.length == 0)
         return;
       var post = posts[0];
@@ -413,7 +429,7 @@ app.get('/dashboard/qfeed/:index?',
 
   // send a page from DB
   var numToFetch = app.locals.NUM_POSTS_PER_FETCH;
-  db.fetchQueuedPosts(index, numToFetch, function(err, posts) {
+  db.fetchQueuedPosts(index, numToFetch, {}, function(err, posts) {
     _assembleFeed(req, posts, function(feed) {
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(feed, null, 2));
