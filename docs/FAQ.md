@@ -24,6 +24,8 @@ And because there are so many companies fighting to get you hooked to their serv
 
 Almost every cloud platform today gives you generous free quotas to run your web application. So `secret campfire` was designed to take advantage of this. It's designed to be lightweight and modular, so that each of its components can live entirely within the free budgets of various cloud platforms like Heroku, Google Cloud or Microsoft Azure. It's a win-win because we get a free ride while they get more people using their platform.
 
+--- 
+
 ## Why does my blog go to sleep after a while, and why does it take a long time to start back up again? 
 
 When you deploy your `secret campfire` blog on Heroku for free, they set you up on their free `Dyno`. By default, that gives you 550 free hours per month. And if it receives no traffic for 30 minutes, your `Dyno` goes to sleep. If your blog gets visited while asleep, it will wake up again after a short delay. (https://devcenter.heroku.com/articles/free-dyno-hours).
@@ -49,7 +51,7 @@ If you are opposed to this, you can still use `secret campfire` without a credit
 
 ## How can I have multiple blogs?
 
-First, repeat the steps in the [Quickstart](../README.md#quickstart-instructions-time-needed-5-minutes) for each new blog you want to create. 
+First, repeat the steps in the [Quickstart](../README.md#quickstart-instructions-time-needed-10-minutes) for each new blog you want to create. 
 
 Then, as you sign in to each of your blogs, `secret campfire` remembers all the blogs you own. All your connected blogs appear in a handy menu at the top right of the screen. Select the blog you want to browse as, and all your `secret campfire` actions will be performed for your selected blog. E.g., if you select your *first blog* from the menu and then click a `Reblog` button on a post, the post will be reblogged to your *first blog*. 
 
