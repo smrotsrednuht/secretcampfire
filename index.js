@@ -1,3 +1,4 @@
+require('dotenv').config()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const cel = require('connect-ensure-login')
@@ -8,6 +9,7 @@ const path = require('path')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const session = require('express-session')
+const MongoStore = require('connect-mongo')(session);
 const db = require('./db')
 const consts = require('./consts')
 const cron = require('./cron')
@@ -15,7 +17,7 @@ const cron = require('./cron')
 const PORT = process.env.PORT || 5000
 
 /* 
- * setup passport for auth
+ * setup passport for authentication
  */
 
 passport.use(new LocalStrategy(function(username, password, cb) {
@@ -61,7 +63,13 @@ app
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }))
   .use(session({
-    secret: app.locals.SITE_NAME, resave: false, saveUninitialized: false 
+    secret: app.locals.SITE_NAME, 
+    resave: false, 
+    saveUninitialized: false,
+    store: new MongoStore({ 
+      url: process.env.MONGODB_URI,
+      touchAfter: 6 * 3600 // time period in seconds
+    })
   }))
   .use(passport.initialize())
   .use(passport.session())
@@ -87,6 +95,12 @@ app.use((err, req, res, next) => {
   res.send('500: Internal server error');
 });
 
+function _decodeScampyUri(uri) { 
+  if (!uri)
+    return uri;
+  return uri.replace(/\|/g, '/');
+}
+
 function _getReqProtocol(req) {
   return req.headers['x-forwarded-proto'] || req.protocol;
 }
@@ -110,6 +124,8 @@ function _render(req, res, myuri) {
     else
       uri = myuri;
   }
+
+  uri = _decodeScampyUri(uri);
 
   res.render('pages/render', {
     'uri': uri,
@@ -188,7 +204,7 @@ app.get('/feed/:index?', _nocache, function (req, res) {
 });
 
 app.get('/follow/check/:uri?', function (req, res) {
-	var uri = req.params['uri'];
+  var uri = _decodeScampyUri(req.params['uri']);
   db.isFollowing(uri, function(err, doc) {
     isFollowing = (doc)? true : false;
     ret = {
