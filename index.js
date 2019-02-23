@@ -190,6 +190,8 @@ app.get('/feed/:index?', _nocache, function (req, res) {
 app.get('/follow/check/:uri?', function (req, res) {
 	var uri = req.params['uri'];
   db.isFollowing(uri, function(err, doc) {
+    console.log(err);
+    console.log(doc);
     isFollowing = (doc)? true : false;
     ret = {
       'is_following': isFollowing
