@@ -1,5 +1,9 @@
 <nav class="navbar fixed-top navbar-expand-lg navbar-light">
   <a class="navbar-brand" id="navbar-logo-link" href="<%= MASTER_URL %>"><img class="logo rounded-circle" src="/media/logoLight.png"></a>
+  <a class="btn btn-info btn-sm collapse" role="button" id="navbar-get-scampy-button" href="<%= MASTER_URL %>">
+    <small>Get your <b>secret campfire</b> here</small>
+  </a>
+
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-supported-content" aria-controls="navbar-supported-content" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -46,7 +50,7 @@ var Navbar = new function() {
     this.drawActiveBlogWidget(); 
 
     $("#navbar-logo-link").popover(
-      Utils.makeBsTooltipCfg('Get your <b>secret campfire</b> blog'));
+      Utils.makeBsTooltipCfg('Get your <b>secret campfire</b> here'));
   };
 
   this.drawActiveBlogWidget = function() {
@@ -56,16 +60,20 @@ var Navbar = new function() {
       if (!urls || !urls.length)
       {
         // try again later
+        $("#navbar-get-scampy-button").show();
         $("#active-blog-display").html("").hide();
         setTimeout(function() {
           nb.drawActiveBlogWidget();
-        }, 3000);
+        }, 10000);
         return;
       }
 
-      //urls.sort();
-
+      $("#navbar-get-scampy-button").hide();
       nb.activateDashButton(); 
+
+      var activeUrl = urls[0]; // pick up the active url before sorting
+
+      urls.sort(); // sort to keep the menu list consistent
 
       var menuItemsHtml = "";
       for (var ui=0; ui < urls.length; ui++)
@@ -89,18 +97,18 @@ var Navbar = new function() {
         + menuItemsHtml
         + '</div></div>';
       }
-      var displayUrl = Utils.prettifyBlessedHostUrlForDisplay(urls[0]);
+      var displayUrl = Utils.prettifyBlessedHostUrlForDisplay(activeUrl);
       $("#active-blog-display").html(
         "<span class='oi oi-fire' id='active-blog-visit-button'"
         + " style='cursor: pointer' aria-hidden='true'"
-        + " data-url='" + urls[0] + "'></span> "
+        + " data-url='" + activeUrl + "'></span> "
         + "<span id='active-blog'"
         + " style='cursor:pointer;font-weight:bold;'>"
         + displayUrl
         + "</span> "
         + dropdownHtml).show()
       $("#active-blog").click(function() {
-        SetBlogWidget.open();  
+        //SetBlogWidget.open();  
       }).popover(Utils.makeBsTooltipCfg('Connected | ' + displayUrl));
       $("#active-blog-display .dropdown-item").click(function(e) {
         var url = $(this).data('url');
