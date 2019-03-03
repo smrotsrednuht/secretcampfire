@@ -17,7 +17,8 @@
       password: String,
       nsfw: Boolean,
       imgur_key: String,
-      queue_interval: { type: Number, default: 0 }
+      queue_interval: { type: Number, default: 0 },
+      custom_head: String
     });
 
     const PostSchema = new mongoose.Schema({
@@ -34,10 +35,6 @@
       queued: { type: Boolean, default: false }
     });
 
-    // collections:
-    // - follows
-    // - followers
-    // - postsources
     const FollowSchema = new mongoose.Schema({
       id: String,
       date: { type: Date, default: Date.now },
@@ -48,12 +45,23 @@
       count: { type: Number, default: 0 }
     });
 
+    const NoteSchema = new mongoose.Schema({
+      id: String,
+      date: { type: Date, default: Date.now },
+      type: { type: String, enum: ['like', 'reblog'] },
+      url_key: { type: String, unique: true },
+      url: { type: String }, // relative if local, full url if remote
+      visitor: { type: String, default: "" }
+    });
+
     const _schema = {
       'Settings': SettingsSchema,
       'Post': PostSchema,
       'Follow': FollowSchema,
       'Follower': FollowSchema,
-      'PostSource': FollowSchema
+      'PostSource': FollowSchema,
+      'Like': NoteSchema,
+      'Note': NoteSchema
     };
 
     /* 
@@ -450,6 +458,64 @@
     }
 
     /*
+     * notes
+     */
+
+    module.exports.isLiked = function(url, cb) {
+      try {
+        _Model('Like').findOne({
+          'url_key': _makeUrlKey(url)
+        }, function(err, doc) {
+          if (cb)
+            cb(err, doc);
+        });
+      }
+      catch(err) {
+        console.error(err);
+        if (cb)
+          cb(err, null);
+      }
+    }
+
+    module.exports.addToLikes = function(url, cb) {
+      try {
+        var urlKey = _makeUrlKey(url);
+
+        like = new _Model('Like')({
+          type: 'like',
+          url_key: urlKey,
+          url: url
+        });
+        like.id = like._id;
+
+        like.save(function(err) {
+          if (cb)
+            cb(err, like);
+        });
+      }
+      catch(err) {
+        console.error(err);
+        if (cb)
+          cb(err, {});
+      }
+    }
+
+    module.exports.delFromLikes = function(url, cb) {
+      try {
+        var urlKey = _makeUrlKey(url);
+        _Model('Like').deleteOne({'url_key': urlKey}, function(err) {
+          if (cb)
+            cb(err);
+        });
+      }
+      catch(err) {
+        console.error(err);
+        if (cb)
+          cb(err);
+      }
+    }
+
+    /*
      * blog
      */
     module.exports.getSettings = function(cb, dbName) {
@@ -495,6 +561,7 @@
         settings.nsfw = newSettings.nsfw;
         settings.imgur_key = newSettings.imgur_key;
         settings.queue_interval = newSettings.queue_interval;
+        settings.custom_head = newSettings.custom_head;
         if (newSettings.password)
           settings.password = md5(newSettings.password);
         

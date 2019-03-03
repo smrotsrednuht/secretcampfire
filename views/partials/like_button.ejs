@@ -1,0 +1,92 @@
+var LikeButton = new function() { 
+  this.activate = function(els) {
+    this.updateStatus(els);
+
+    var obj = this;
+    els.each(function() {
+      var lb = $(this);
+
+      if (lb.data('like-action-bound'))
+        return;
+
+      lb.mouseup(function(e) {
+        var leftClick = e.which == 1;
+        var middleClick = e.which == 2;
+        if (!leftClick && !middleClick)
+          return;
+          
+        e.preventDefault();
+
+        var likeUrl = lb.data('like-url');
+        SetBlogWidget.getBlog(function(url) {
+          $.ajax(url+"/is_connected", {
+            dataType: "json",
+            success: function(data, status, xhr) {
+              if (!data || !data.is_connected)
+              {
+                SetBlogWidget.open();
+                return;
+              }
+
+              obj.handleClick(lb, url, likeUrl, middleClick);
+            },
+            error: function(jqxhr, textStatus, errorThrown) {
+              console.error(errorThrown);
+            },
+            xhrFields: {
+              withCredentials: true
+            },
+            crossDomain: true
+          });
+        });
+
+        return false;
+      })
+      .data('like-action-bound', true);
+    });
+  };
+
+  this.updateStatus = function(els) {
+    SetBlogWidget.getBlog(function(url) {
+      if (!url)
+        return;
+      els.each(function() {
+        var lb = $(this);
+        var likeUrl = lb.data('like-url');
+        var checkUrl = url
+            + "/like/check/"
+            + Utils.encodeScampyUriParam(likeUrl);
+        $.ajax(checkUrl, {
+          dataType: "json",
+          success: function(data) {
+            if (data && data.is_liked)
+              lb.data('liked', true).addClass('liked'); 
+          },
+          crossDomain: true
+        });
+      });
+    }, /*checkOnly*/true);
+  };
+
+  this.handleClick = function(lb, userUrl, likeUrl, openNewTab) {
+    var actionPath = "/like";
+    if (lb.data('liked'))
+      actionPath = "/like/delete";
+
+    $.ajax(userUrl + actionPath, { 
+      method: "POST",
+      data: { url: likeUrl },
+      dataType: "json",
+      success: function(data, status, xhr) {
+        if (lb.data('liked'))
+          lb.data('liked', null).removeClass('liked');
+        else
+          lb.data('liked', true).addClass('liked');
+      },
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true
+    });
+  }
+};

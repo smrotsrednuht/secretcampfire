@@ -56,9 +56,13 @@ app.locals.MASTER_NEWS = consts.MASTER_NEWS;
 app.locals.BLESSED_SCAMPY_DOMAINS = consts.BLESSED_SCAMPY_DOMAINS;
 app.locals.NUM_POSTS_PER_FETCH = consts.NUM_POSTS_PER_FETCH;
 
+const corsOptions = {
+  origin: true,
+  credentials: true,
+  optionsSuccessStatus: 200
+}
 app
-  .use(cors())
-  .options('*', cors())
+  .use(cors(corsOptions))
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
@@ -108,7 +112,11 @@ function _getDbNameFromHostUrl(host) {
     return "";
 
   var urlObj = new URL(host);
-  return urlObj.host.split('.')[0];
+  var name = urlObj.host.split('.')[0];
+  name = name.toLowerCase();
+  name = name.replace(/-/g, '_');
+
+  return name;
 }
 
 function _getReqProtocol(req) {
@@ -161,12 +169,13 @@ app.get('/', function(req, res) {
   });
 });
 
-function _assembleFeed(req, contents, cb, hostUrl) {
-  var host = req.headers.host;
+function _assembleFeed(req, contents, cb) {
   var dbName = "";
+  var host = req.headers.host;
 
-  if (hostUrl)
+  if (req.query['host'])
   {
+    const hostUrl = req.query['host'];
     dbName = _getDbNameFromHostUrl(hostUrl);
     var urlObj = new URL(hostUrl);
     host = urlObj.host;
@@ -192,6 +201,7 @@ function _assembleFeed(req, contents, cb, hostUrl) {
       feed.header_url = settings.header_url;
       if (settings.nsfw)
         feed.nsfw = true;
+      feed.custom_head = (settings.custom_head)? settings.custom_head : "";
     }
 
     for (k in contents)
@@ -211,7 +221,7 @@ app.get('/feed/:index?', function (req, res) {
 
   filter = {};
   if (req.query['tag'])
-    filter['tags'] = req.query['tag'];
+    filter['tags'] = { '$regex': req.query['tag'], '$options': 'i' };
 
   /*
    * 'host' param can be optionally passed to ask this server to
@@ -233,7 +243,7 @@ app.get('/feed/:index?', function (req, res) {
     _assembleFeed(req, { 'posts': posts }, function(feed) {
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(feed, null, 2));
-    }, req.query['host']);
+    });
   }, dbName);
 
   if (index == 0)
@@ -298,19 +308,29 @@ app.get('/following/:index?', function (req, res) {
   });
 });
 
-app.get('/is_owner', function (req, res) {
-  var isOwner = false;
+app.get(['/is_connected', '/is_owner'], function (req, res) {
+  var isConnected = false;
   if (req.user)
-    isOwner = true;
-
+    isConnected = true;
   ret = {
-    'is_owner': isOwner
+    'is_owner': isConnected,
+    'is_connected' : isConnected
   };
-
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(ret, null, 2));
 });
 
+app.get('/like/check/:uri?', function (req, res) {
+  var uri = _decodeScampyUriParam(req.params['uri']);
+  db.isLiked(uri, function(err, doc) {
+    isLiked = (doc)? true : false;
+    ret = {
+      'is_liked': isLiked
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(ret, null, 2));
+  });
+});
 
 app.get('/login', function(req, res) {
   res.render('pages/login', {
@@ -394,9 +414,10 @@ app.get('/tag/:tag/:index?', function (req, res) {
 // catch-all route
 app.get('*', function (req, res, next) {
   if (req.url.indexOf("/dashboard") != -1
-    || req.url.indexOf("/settings") != -1
     || req.url.indexOf("/follow") != -1
-    || req.url.indexOf("/logout") != -1)
+    || req.url.indexOf("/like") != -1
+    || req.url.indexOf("/logout") != -1
+    || req.url.indexOf("/settings") != -1)
     return next();
 
   res.send("");
@@ -553,6 +574,32 @@ app.post('/settings', cel.ensureLoggedIn(), function(req, res) {
       _cronDeactivatePostQueue();
 
     res.status(200).json(settings);
+  });
+});
+
+app.post('/like', cel.ensureLoggedIn(), function(req, res) {
+  var url = req.body.url;
+  if (url.indexOf('/post/') == -1)
+  {
+    res.status(500).send("{}");
+    return;
+  }
+  
+  db.addToLikes(url, function(err, newLike) {
+    res.status(200).json(newLike);
+  });
+});
+
+app.post('/like/delete', cel.ensureLoggedIn(), function(req, res) {
+  var url = req.body.url;
+  if (url.indexOf('/post/') == -1)
+  {
+    res.status(500).send("{}");
+    return;
+  }
+  
+  db.delFromLikes(url, function(err) {
+    res.status(200).json({});
   });
 });
 

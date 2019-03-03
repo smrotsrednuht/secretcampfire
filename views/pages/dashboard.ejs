@@ -7,7 +7,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-infinitescroll/3.0.5/infinite-scroll.pkgd.min.js"></script>
   <link rel="stylesheet" type="text/css" href="/stylesheets/render.css" />
   <link rel="stylesheet" type="text/css" href="/stylesheets/dashboard.css" />
-  <% include ../partials/custom.ejs %>
 </head>
 
 <body>
@@ -97,6 +96,7 @@
         <div class="card-action-bar p-1">
           <div class="row">
             <div class="col text-right">
+              <div class='d-inline-block card-like-button oi oi-heart action-bar-button' title='Like' aria-hidden='true'></div>
               <div class='d-inline-block card-reblog-button oi oi-loop action-bar-button' title='Reblog' aria-hidden='true'></div>
               <div class='collapse card-post-now-button oi oi-check action-bar-button' title='Post now' aria-hidden='true'></div>
             </div>
@@ -112,7 +112,10 @@
     <div class="modal-dialog" role="document"><div class="modal-content">
       <div class="modal-header">
         <div class="avatar collapse"></div>
-        <h5 class="modal-title">New post</h5>
+        <h5 class="modal-title">
+          <span class="action">New post</span>
+          <span class="target-name"></span>
+        </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -193,7 +196,10 @@
     <div class="modal-dialog" role="document"><div class="modal-content">
       <div class="modal-header">
         <div class="avatar collapse"></div>
-        <h5 class="modal-title">Follow new <b><%= SITE_NAME %></b></h5>
+        <h5 class="modal-title">
+          <span class="action">Follow</span>
+          <span class="target-name"></span>
+        </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -223,7 +229,10 @@
     <div class="modal-dialog" role="document"><div class="modal-content">
       <div class="modal-header">
         <div class="avatar collapse"></div>
-        <h5 class="modal-title">Unfollow</h5>
+        <h5 class="modal-title">
+          <span class="action">Unfollow</span>
+          <span class="target-name"></span>
+        </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -276,9 +285,9 @@
   <script>
     <% include ../partials/dashboard.ejs %>
     <% include ../partials/reblog_button.ejs %>
+    <% include ../partials/like_button.ejs %>
     <% include ../partials/render_feed.ejs %>
     <% include ../partials/news.ejs %>
-    <% include ../partials/utils.ejs %>
     <% include ../partials/image_uploader.ejs %>
 
     /* 
@@ -307,26 +316,6 @@
      * Dashboard feed
      */
     var renderUris = <%- JSON.stringify(render_uris) %>;
-
-    // apply style and modify title bar
-    if (renderUris.length == 1 && (_isPostsPage || _isQueuePage))
-    {
-      $.getJSON(renderUris[0], function(data) {
-        if (data.style_url)
-          Utils.addCss(data.style_url);
-
-        var pageLabel = "";
-        if (_isPostsPage) pageLabel = " - Posts - ";
-        if (_isQueuePage) pageLabel = " - Queue - ";
-
-        if (data.name && (_isPostsPage || _isQueuePage))
-          $("title").prepend(data.name + pageLabel);
-        else
-          $("title").prepend("Dashboard - Posts - ");
-      });  
-    }
-    else
-      $("title").prepend("Dashboard - ");
 
     // enable 'post now' button if on Queue page
     if (_isQueuePage)

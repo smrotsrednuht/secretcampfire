@@ -15,13 +15,30 @@
 </div>
 
 <script>
+<% include ../partials/utils.ejs %>
+
 var Masthead = new function() {
   this.init = function(uri) {
     this.uri = uri;
     this._mdConverter = new showdown.Converter();
 
     this.update();
-  };
+  }
+
+  this.reset = function() {
+    if ($("#masthead-head-marker").length == 0)
+    {
+      // first time, inject marker into <head> 
+      // to mark where orig head content ended
+      $("head").append("<script id='masthead-head-marker'><\/script>");
+    }
+
+    // delete everything we added after our marker
+    $("#masthead-head-marker").nextAll().remove();
+
+    // reset title
+    $("title").html($("title").html().split(" - ").slice(-1)[0]); 
+  }
 
   this.update = function() {
     if (typeof NsfwOverlay !== 'undefined')
@@ -37,9 +54,12 @@ var Masthead = new function() {
           NsfwOverlay.close();
       }
 
-      // set site info
-      if (data.name)
-        $("title").prepend(data.name + " - ");
+      mh.reset();
+
+      /*
+       * set site info
+       */
+      mh.setTitleBar(data);
       $("head")
         .append('<meta property="og:title" content="' + data.name + '">')
         .append('<meta property="og:description" content="' 
@@ -50,7 +70,9 @@ var Masthead = new function() {
         .append('<meta property="og:image" content="' + data.avatar_url + '">')
         .append('<meta property="og:type" content="website">');
 
-      // set jumbotron
+      /*
+       * set jumbotron
+       */
       if (data.header_url)
         $("#jumbotron").css('background-image', 
           'url(' + data.header_url + ')')
@@ -59,7 +81,9 @@ var Masthead = new function() {
         $("#jumbotron").css('background-image', 'url()')
           .removeClass('active').addClass('inactive');
 
-      // set masthead
+      /*
+       * set masthead
+       */
       if (data.name || data.description || data.avatar_url)
       {
         $("#masthead").show();
@@ -90,7 +114,30 @@ var Masthead = new function() {
       }
       else
         $("#masthead").hide();
+
+      if (data.style_url)
+        Utils.addCss(data.style_url);
+
+      if (data.custom_head)
+        $("head").append(data.custom_head);
     });
+  }
+
+  this.setTitleBar = function(data) {
+    var pageLabel = "";
+    if (window.location.pathname.indexOf("/dashboard/posts") != -1)
+      pageLabel = "Dashboard - Posts - ";
+    else if (window.location.pathname.indexOf("/dashboard/queue") != -1)
+      pageLabel = "Dashboard - Queue - ";
+    else if (window.location.pathname.indexOf("/dashboard") != -1)
+      pageLabel = "Dashboard - ";
+    else if (window.location.pathname.indexOf("/settings") != -1)
+      pageLabel = "Settings - ";
+
+    $("title").prepend(pageLabel);
+
+    if (data.name)
+      $("title").prepend(data.name + " - ");
   }
 };
 
