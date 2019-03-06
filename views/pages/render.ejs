@@ -6,6 +6,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-infinitescroll/3.0.5/infinite-scroll.pkgd.min.js"></script>
   <link rel="stylesheet" type="text/css" href="/stylesheets/render.css" />
+
+  <% if (typeof site_template !== 'undefined' && site_template.dark_mode) { %>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/dark.css" />
+  <% }  %>
 </head>
 
 <body>
@@ -113,10 +117,11 @@
     <% include ../partials/render_feed.ejs %>
     <% include ../partials/render_post.ejs %>
     <% include ../partials/follow_button.ejs %>
+    <% include ../partials/utils.ejs %>
   
     var renderer = null;
   
-    $.getJSON("<%= uri %>", function(data) {
+    $.getJSON(Utils.timestampUrl("<%= uri %>"), function(data) {
       if (data.posts)
       {
         // feed view

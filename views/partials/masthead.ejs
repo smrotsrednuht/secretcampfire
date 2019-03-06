@@ -45,7 +45,7 @@ var Masthead = new function() {
       NsfwOverlay.open();
 
     var mh = this;
-    $.getJSON(this.uri, function(data) {
+    $.getJSON(Utils.timestampUrl(this.uri), function(data) {
       if (typeof NsfwOverlay !== 'undefined')
       {
         if (data.nsfw)
@@ -117,6 +117,9 @@ var Masthead = new function() {
 
       if (data.style_url)
         Utils.addCss(data.style_url);
+
+      if (data.dark_mode)
+        Utils.addCss("<%= DARK_MODE_CSS %>");
 
       if (data.custom_head)
         $("head").append(data.custom_head);

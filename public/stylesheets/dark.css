@@ -1,0 +1,86 @@
+body {
+  background-color: black;
+  color: #888;
+}
+
+.modal-content {
+  background-color: #222;
+}
+
+#center-logo {
+  filter: invert(40%);
+}
+
+.btn-primary {
+  background-color: #444;
+}
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+  border-color: #222;
+}
+.btn-secondary {
+  background-color: #222;
+}
+
+#active-blog:hover {
+  color: #dda;
+}
+#active-blog-display {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+#active-blog-display:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+#masthead a {
+  color: #aEaAa6;
+}
+
+.card {
+  background-color: #111;
+}
+.card .fold {
+  border-color: transparent #222 transparent #222;
+  background-color: #248;
+}
+.card-author-post-link, .card-reblog-author-post-link {
+  color: #aaa;
+}
+
+#post-container .action-bar {
+  color: #444;
+}
+
+a.card-title-link,
+#post-container a.title-link {
+  color: #888;
+}
+.card-body,
+#post-container .text {
+  color: #888;
+}
+
+.card-text blockquote {
+  border-color: #333;
+}
+
+#feed-grid-top-right-menu {
+  color: #333;
+}
+
+.sk-cube-grid .sk-cube {
+  background-color: #033;
+}
+
+.form-control {
+  background: #aaa;
+}
+
+footer {
+  color: #888;
+}
+footer a {
+  color: #666;
+}
+footer a:hover {
+  color: #dda;
+}

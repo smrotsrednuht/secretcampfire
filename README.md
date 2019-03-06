@@ -3,14 +3,20 @@
 # secret campfire 
 ![version](https://img.shields.io/badge/version-1.2.0-blue.svg?style=for-the-badge)
 
-`secret campfire` is a free tumblr replacement with a few twists:
+`secret campfire` is a free tumblr replacement made by/for tumblr refugees with a few twists:
 - Post anything you want
 - Your blogs belong 100% to you
-- Your blogs live forever and no one can shut you down 
+- Your blogs live forever and no one can censor, ban or delete you 
+
+## How is *secret campfire* different?
+
+| <img src="docs/media/new-way.png" alt="secret campfire way"> | <img src="docs/media/old-way.png" alt="Evil way">  |
+| -------------------------------------------------- | ------------------------------------------------------------ |
+| **`secret campfire`** way: your site is 100% yours and you connect to other `secret campfires` directly in your secret network. It takes a few extra minutes to set up, but then you're free to express yourself, your sites live forever and no one can shut you down. | **Old way:** you make an account on *their* site... then they own your account and you become a slave to their site. If your tumblr was murdered by their recent NSFW ban like us, you know this pain. The old way might be easier to set up, but when you use someone else's site you're forever in danger of getting censored, banned & deleted. |
 
 ## How to get an official *secret campfire* 
 
-For an official `secret campfire` on `secretcampfire.com`, email [getscampy@secretcampfire.com](mailto:getscampy@secretcampfire.com). As a special introductory offer, we'll set up your new home and give you free lifetime hosting for just $5. Hurry before your favorite name gets taken by someone else.
+For an official `secret campfire` on `secretcampfire.com`, email [getscampy@secretcampfire.com](mailto:getscampy@secretcampfire.com). We'll set up your new home and give you free lifetime hosting for a one-time fee of $5. Hurry before your favorite name gets taken by someone else.
 
 ## How to set up your own free *secret campfire* 
 
@@ -51,13 +57,6 @@ That's why `secret campfire` was created on January 2019 to replace tumblr. Beca
 With `secret campfire`, you can finally set up your forever home online. It belongs to you and you alone. No one can tell you what you can or can't do with it. And no one can shut you down. 
 
 Enjoy the 'fire and share the love: http://secretcampfire.com
-
-## How is *secret campfire* different?
-
-
-| <img src="docs/media/new-way.png" alt="secret campfire way"> | <img src="docs/media/old-way.png" alt="Evil way">  |
-| -------------------------------------------------- | ------------------------------------------------------------ |
-| **`secret campfire`** way: your site is 100% yours and you connect to other `secret campfires` directly in your secret network. You're free to express yourself, your sites live forever and no one can shut you down. | **Old way:** you make an account on *their* site... then they own your account and you're locked in. Which means they can shut you down and delete your account anytime they feel like it. | **Old way:** you make an account on their site... then they own your account and you're locked in. Which means they can shut you down and delete your account anytime they feel like it. |
 
 ## Features
 

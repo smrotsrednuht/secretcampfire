@@ -3,14 +3,14 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const cel = require('connect-ensure-login')
 const express = require('express')
-const http = require('http')
-const md5 = require('md5');
+const md5 = require('md5')
 const path = require('path')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
+const request = require('request')
 const session = require('express-session')
-const MongoStore = require('connect-mongo')(session);
-const URL = require('url').URL;
+const MongoStore = require('connect-mongo')(session)
+const URL = require('url').URL
 const db = require('./db')
 const consts = require('./consts')
 const cron = require('./cron')
@@ -55,11 +55,14 @@ app.locals.MASTER_FEED = consts.MASTER_FEED;
 app.locals.MASTER_NEWS = consts.MASTER_NEWS;
 app.locals.BLESSED_SCAMPY_DOMAINS = consts.BLESSED_SCAMPY_DOMAINS;
 app.locals.NUM_POSTS_PER_FETCH = consts.NUM_POSTS_PER_FETCH;
+app.locals.DARK_MODE_CSS = consts.DARK_MODE_CSS;
 
 const corsOptions = {
   origin: true,
   credentials: true,
   optionsSuccessStatus: 200
+  // should we modify Vary: Origin to workaround Chrome caching Origin?
+  // https://bugs.chromium.org/p/chromium/issues/detail?id=260239
 }
 app
   .use(cors(corsOptions))
@@ -126,6 +129,10 @@ function _getFeedUrl(req) {
   // default to own feed
   return _getReqProtocol(req) + '://' + req.headers.host + '/feed';
 }
+function _getLikeFeedUrl(req) {
+  // default to own feed
+  return _getReqProtocol(req) + '://' + req.headers.host + '/dashboard/likefeed';
+}
 function _getQueueFeedUrl(req) {
   // default to own feed
   return _getReqProtocol(req) + '://' + req.headers.host + '/dashboard/qfeed';
@@ -145,9 +152,12 @@ function _render(req, res, myuri) {
 
   uri = _decodeScampyUriParam(uri);
 
-  res.render('pages/render', {
-    'uri': uri,
-    'fullscreen': req.query['fullscreen']
+  _assembleFeed(req, {}, function(siteTemplate) {
+    res.render('pages/render', {
+      'uri': uri,
+      'fullscreen': req.query['fullscreen'],
+      'site_template': siteTemplate
+    });
   });
 }
 function _nocache(req, res, next) {
@@ -190,7 +200,8 @@ function _assembleFeed(req, contents, cb) {
       'style_url': _getReqProtocol(req) + '://' + host 
                       + '/stylesheets/feed.css',
       'blog_url': _getReqProtocol(req) + "://" + host,
-      'nsfw': false
+      'nsfw': false,
+      'dark_mode': false
     };
 
     if (settings)
@@ -199,9 +210,9 @@ function _assembleFeed(req, contents, cb) {
       feed.description = settings.description;
       feed.avatar_url = settings.avatar_url;
       feed.header_url = settings.header_url;
-      if (settings.nsfw)
-        feed.nsfw = true;
+      feed.nsfw = (settings.nsfw)? true : false;
       feed.custom_head = (settings.custom_head)? settings.custom_head : "";
+      feed.dark_mode = (settings.dark_mode)? true : false;
     }
 
     for (k in contents)
@@ -474,11 +485,33 @@ app.get('/dashboard/posts/:index?', cel.ensureLoggedIn(), function (req, res) {
 	var index = req.params['index'];
   index = (index)? parseInt(index) : 0;
 
-  res.render('pages/dashboard', {
-    'uri': _getFeedUrl(req),
-    'render_uris': [
-      _getFeedUrl(req) + "/" + index
-    ]
+  _assembleFeed(req, {}, function(siteTemplate) {
+    res.render('pages/dashboard', {
+      'uri': _getFeedUrl(req),
+      'render_uris': [
+        _getFeedUrl(req) + "/" + index
+      ],
+      'site_template': siteTemplate
+    });
+  });
+});
+
+app.get('/dashboard/likefeed/:index?', 
+  [_nocache, cel.ensureLoggedIn()], function (req, res) {
+  var index = req.params['index'];
+  index = (index)? parseInt(index) : 0;
+
+  // send a page from DB
+  var options = {
+    'index': index,
+    'limit': app.locals.NUM_POSTS_PER_FETCH,
+    'filter': {}
+  };
+  db.fetchLikes(options, function(err, posts) {
+    _assembleFeed(req, { 'posts' : posts }, function(feed) {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(feed, null, 2));
+    });
   });
 });
 
@@ -501,6 +534,21 @@ app.get('/dashboard/qfeed/:index?',
   });
 });
 
+app.get('/dashboard/likes/:index?', cel.ensureLoggedIn(), function (req, res) {
+	var index = req.params['index'];
+  index = (index)? parseInt(index) : 0;
+
+  _assembleFeed(req, {}, function(siteTemplate) {
+    res.render('pages/dashboard', {
+      'uri': _getLikeFeedUrl(req),
+      'render_uris': [
+        _getLikeFeedUrl(req) + "/" + index
+      ],
+      'site_template': siteTemplate
+    });
+  });
+});
+
 app.get('/dashboard/queue/count', cel.ensureLoggedIn(), function (req, res) {
   db.getQueuedCount(function(err, num) {
     ret = {
@@ -515,11 +563,14 @@ app.get('/dashboard/queue/:index?', cel.ensureLoggedIn(), function (req, res) {
 	var index = req.params['index'];
   index = (index)? parseInt(index) : 0;
 
-  res.render('pages/dashboard', {
-    'uri': _getQueueFeedUrl(req),
-    'render_uris': [
-      _getQueueFeedUrl(req) + "/" + index
-    ]
+  _assembleFeed(req, {}, function(siteTemplate) {
+    res.render('pages/dashboard', {
+      'uri': _getQueueFeedUrl(req),
+      'render_uris': [
+        _getQueueFeedUrl(req) + "/" + index
+      ],
+      'site_template': siteTemplate
+    });
   });
 });
 
@@ -543,9 +594,12 @@ app.get('/dashboard/:start_offset?', cel.ensureLoggedIn(), function(req, res) {
       followUris.push(url);
     }
 
-    res.render('pages/dashboard', {
-      'uri': _getFeedUrl(req),
-      'render_uris': followUris
+    _assembleFeed(req, {}, function(siteTemplate) {
+      res.render('pages/dashboard', {
+        'uri': _getFeedUrl(req),
+        'render_uris': followUris,
+        'site_template': siteTemplate
+      });
     });
   });
 });
@@ -559,9 +613,12 @@ app.get('/settings', cel.ensureLoggedIn(), function (req, res) {
       return;
     }
 
-    res.render('pages/settings', {
-      'uri': _getFeedUrl(req),
-      'settings': settings
+    _assembleFeed(req, {}, function(siteTemplate) {
+      res.render('pages/settings', {
+        'uri': _getFeedUrl(req),
+        'settings': settings,
+        'site_template': siteTemplate
+      });
     });
   });
 });
@@ -578,16 +635,30 @@ app.post('/settings', cel.ensureLoggedIn(), function(req, res) {
 });
 
 app.post('/like', cel.ensureLoggedIn(), function(req, res) {
-  var url = req.body.url;
-  if (url.indexOf('/post/') == -1)
-  {
+  try {
+    var url = req.body.url;
+    if (!url || url.indexOf('/post/') == -1)
+    {
+      res.status(500).send("{}");
+      return;
+    }
+
+    request(url, { json: true }, function(e, r, data) {
+      if (e || !data || !data.post)
+      {
+        console.error("/like error: ", e);
+        res.status(500).send("{}");
+        return;
+      }
+
+      db.addToLikes(url, data, function(err, newLike) {
+        res.status(200).json(newLike);
+      });
+    });
+  } catch(err) {
+    console.error(err);
     res.status(500).send("{}");
-    return;
   }
-  
-  db.addToLikes(url, function(err, newLike) {
-    res.status(200).json(newLike);
-  });
 });
 
 app.post('/like/delete', cel.ensureLoggedIn(), function(req, res) {
