@@ -58,15 +58,8 @@ app.locals.NUM_POSTS_PER_FETCH = consts.NUM_POSTS_PER_FETCH;
 app.locals.DARK_MODE_CSS = consts.DARK_MODE_CSS;
 app.locals.HOME_UPLOAD_KEY = process.env.HOME_UPLOAD_KEY;
 
-const corsOptions = {
-  origin: true,
-  credentials: true,
-  optionsSuccessStatus: 200
-  // should we modify Vary: Origin to workaround Chrome caching Origin?
-  // https://bugs.chromium.org/p/chromium/issues/detail?id=260239
-}
 app
-  .use(cors(corsOptions))
+  .use(cors())
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
@@ -452,12 +445,20 @@ function _cronActivatePostQueue(interval) {
     db.fetchQueuedPosts(options, function(err, posts) {
       if (!posts || posts.length == 0)
         return;
+
       var post = posts[0];
+
+      var now = Date.now();
+      var diffMs = now - post.date;
+      var diffMins = diffMs / 60000;
+      if (diffMins < interval)
+        return;
+
       post.queued = false;
       post.date = Date.now();
       post.save();
     });
-  });
+  }, /* runNow=*/true);
 }
 function _cronDeactivatePostQueue() {
   console.log("[cron] auto-post queue disabled");
